@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mark_shopping/screens/sign_in.dart';
+import 'package:mark_shopping/screens/sing_up.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -37,7 +39,13 @@ class _HomeState extends State<Home> {
           'Sign In',
           style: TextStyle(color: Colors.white),
         ),
-        onPressed: () {},
+        onPressed: () {
+          print('You Click SignIn');
+
+          var signInRoute =
+              MaterialPageRoute(builder: (BuildContext context) => SignIn());
+          Navigator.of(context).push(signInRoute);
+        },
       ),
     );
   }
@@ -68,7 +76,10 @@ class _HomeState extends State<Home> {
           borderRadius: BorderRadius.circular(30.0),
         ),
         child: Text('Sign Up'),
-        onPressed: () {},
+        onPressed: () {
+          var signUpRoute = MaterialPageRoute(builder: (BuildContext context)=> SignUp());
+          Navigator.of(context).push(signUpRoute);
+        },
       ),
     );
   }
@@ -88,8 +99,8 @@ class _HomeState extends State<Home> {
       body: Container(
         decoration: BoxDecoration(
           gradient: RadialGradient(colors: [
-            Colors.blue[200],
-            Colors.black,
+            Colors.white,
+            Colors.lightBlue,
           ], radius: 1.0),
         ),
         child: Column(
