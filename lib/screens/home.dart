@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mark_shopping/screens/my_service.dart';
 import 'package:mark_shopping/screens/sign_in.dart';
 import 'package:mark_shopping/screens/sing_up.dart';
 
@@ -13,6 +15,27 @@ class _HomeState extends State<Home> {
 // Explicit
   double myWidth = 200.0;
 // Method
+
+@override
+void initState(){
+  super.initState();
+  checkStatus();
+}
+
+Future<void> checkStatus()async{
+
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+
+  if (firebaseUser != null){
+
+    var serviceRoute = MaterialPageRoute(builder: (BuildContext context) => Myservice());
+    Navigator.of(context).pushAndRemoveUntil(serviceRoute, (Route<dynamic> route) => false);
+  }
+
+}
+
+
   Widget showAppName() {
     return Container(
       margin: EdgeInsets.only(bottom: 8.0),
