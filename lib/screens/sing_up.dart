@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mark_shopping/screens/my_service.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -6,8 +8,11 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  // explicit
+  // Explicit
   double myPadding = 20.0;
+  String nameString, emailString, passwordString;
+  final formKey = GlobalKey<FormState>();
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   // Method
   Widget showHead() {
@@ -30,11 +35,20 @@ class _SignUpState extends State<SignUp> {
       padding: EdgeInsets.only(left: myPadding, right: myPadding),
       child: TextFormField(
         decoration: InputDecoration(
-            labelText: 'Name :',
-            icon: Icon(
-              Icons.supervisor_account,
-              size: 36.0,
-            )),
+          labelText: 'Name :',
+          icon: Icon(
+            Icons.perm_identity,
+            size: 36.0,
+          ),
+        ),
+        validator: (String value) {
+          if (value.isEmpty) {
+            return 'Please Fill Name in Blank';
+          }
+        },
+        onSaved: (String value) {
+          nameString = value;
+        },
       ),
     );
   }
@@ -51,6 +65,14 @@ class _SignUpState extends State<SignUp> {
             size: 36.0,
           ),
         ),
+        validator: (String value) {
+          if (!((value.contains('@')) && (value.contains('.')))) {
+            return 'Please Type Email Format';
+          }
+        },
+        onSaved: (String value) {
+          emailString = value;
+        },
       ),
     );
   }
@@ -66,14 +88,85 @@ class _SignUpState extends State<SignUp> {
             size: 36.0,
           ),
         ),
+        validator: (String value) {
+          if (value.length < 6) {
+            return 'More 6 Charactor';
+          }
+        },
+        onSaved: (String value) {
+          passwordString = value;
+        },
       ),
     );
   }
 
   Widget uploadButton() {
     return IconButton(
-      icon: Icon(Icons.cloud_upload),onPressed: (){},
+      icon: Icon(Icons.cloud_upload),
+      onPressed: () {
+        print('You Click Upload');
+        if (formKey.currentState.validate()) {
+          formKey.currentState.save();
+          print(
+              'name = $nameString, email = $emailString, password =$passwordString');
+          registerUser();
+        }
+      },
     );
+  }
+
+  Future<void> registerUser() async {
+    await firebaseAuth
+        .createUserWithEmailAndPassword(
+            email: emailString, password: passwordString)
+        .then((response) {
+      print('Register Success');
+      setupDisplayName();
+    }).catchError((response) {
+      print('Error = ${response.toString()}');
+      String titleString = response.code;
+      String messageString = response.message;
+      myAlert(titleString, messageString);
+    });
+  }
+
+  Future<void> setupDisplayName() async {
+
+    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+    UserUpdateInfo userUpdateInfo = UserUpdateInfo();
+    userUpdateInfo.displayName = nameString;
+    firebaseUser.updateProfile(userUpdateInfo);
+
+    var myServiceRoute = MaterialPageRoute(builder: (BuildContext context) => Myservice());
+    Navigator.of(context).pushAndRemoveUntil(myServiceRoute, (Route<dynamic> route) => false);
+   
+
+  }
+
+  void myAlert(String titleString, String messageString) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: ListTile(
+              leading: Icon(
+                Icons.alarm,
+                size: 48.0,
+                color: Colors.red,
+              ),
+              title: Text(titleString),
+            ),
+            content: Text(messageString),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 
   @override
@@ -84,14 +177,17 @@ class _SignUpState extends State<SignUp> {
         title: Text('Sign Up'),
         actions: <Widget>[uploadButton()],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          showHead(),
-          nameText(),
-          emailText(),
-          passwordText(),
-        ],
+      body: Form(
+        key: formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            showHead(),
+            nameText(),
+            emailText(),
+            passwordText(),
+          ],
+        ),
       ),
     );
   }

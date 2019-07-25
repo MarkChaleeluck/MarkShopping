@@ -100,7 +100,7 @@ class _HomeState extends State<Home> {
         decoration: BoxDecoration(
           gradient: RadialGradient(colors: [
             Colors.white,
-            Colors.lightBlue,
+            Colors.white,
           ], radius: 1.0),
         ),
         child: Column(
