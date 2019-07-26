@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mark_shopping/screens/home.dart';
 
 class Myservice extends StatefulWidget {
   @override
@@ -30,6 +31,7 @@ class _MyserviceState extends State<Myservice> {
       child: ListView(
         children: <Widget>[
           headDrawer(),
+          mySignOut(),
         ],
       ),
     );
@@ -51,6 +53,26 @@ class _MyserviceState extends State<Myservice> {
         ],
       ),
     );
+  }
+
+  Widget mySignOut() {
+    return ListTile(
+      leading: Icon(
+        Icons.exit_to_app,
+      ),
+      title: Text('SignOut'),
+      onTap: () {
+        processSignOut();
+
+      },
+    );
+  }
+  Future<void> processSignOut ()async{
+
+await firebaseAuth.signOut().then((response){
+  var homeRoute = MaterialPageRoute(builder: (BuildContext context) => Home());
+  Navigator.of(context).pushAndRemoveUntil(homeRoute,(Route<dynamic> route) => false);
+});
   }
 
   Widget showLogo() {
